@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from util import extract_text_from_pdf, chunk_text
 
 app = FastAPI()
 
@@ -12,8 +13,14 @@ def home():
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
+    file_bytes = await file.read()
+
+    text = extract_text_from_pdf(file_bytes)
+
+    chunks = chunk_text(text)
+
     return {
         "filename": file.filename,
-        "content_type": file.content_type,
-        "message": "File uploaded successfully!"
+        "total_chunks": len(chunks),
+        "first_chunk": chunks[0] if chunks else "No text found"
     }
