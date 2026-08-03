@@ -1,6 +1,7 @@
 import fitz
+from sentence_transformers import SentenceTransformer
 
-
+model = SentenceTransformer("all-MiniLM-L6-v2")
 def extract_text_from_pdf(file_bytes):
     text = ""
 
@@ -18,3 +19,8 @@ def chunk_text(text, chunk_size=500):
         chunks.append(text[i:i + chunk_size])
 
     return chunks
+
+def generate_embeddings(chunks):
+    embeddings = model.encode(chunks)
+
+    return embeddings.tolist()

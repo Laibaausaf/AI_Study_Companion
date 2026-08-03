@@ -1,5 +1,9 @@
 from fastapi import FastAPI, UploadFile, File
-from util import extract_text_from_pdf, chunk_text
+from util import (
+    extract_text_from_pdf,
+    chunk_text,
+    generate_embeddings
+)
 
 app = FastAPI()
 
@@ -19,8 +23,10 @@ async def upload_file(file: UploadFile = File(...)):
 
     chunks = chunk_text(text)
 
+    embeddings = generate_embeddings(chunks)
+
     return {
         "filename": file.filename,
         "total_chunks": len(chunks),
-        "first_chunk": chunks[0] if chunks else "No text found"
+        "embedding_dimension": len(embeddings[0]) if embeddings else 0
     }
