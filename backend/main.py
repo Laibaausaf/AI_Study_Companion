@@ -1,9 +1,11 @@
 from fastapi import FastAPI, UploadFile, File
+
 from util import (
     extract_text_from_pdf,
     chunk_text,
     generate_embeddings
 )
+from qdrant_db import client
 
 app = FastAPI()
 
