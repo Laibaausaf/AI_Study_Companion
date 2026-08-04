@@ -45,3 +45,18 @@ def store_chunks(chunks, embeddings):
         collection_name=COLLECTION_NAME,
         points=points
     )
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
+def search_chunks(question):
+    question_embedding = model.encode(question).tolist()
+
+    results = client.query_points(
+        collection_name=COLLECTION_NAME,
+        query=question_embedding,
+        limit=3
+    )
+
+    return [point.payload["text"] for point in results.points]

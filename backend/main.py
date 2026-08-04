@@ -6,6 +6,7 @@ from util import (
     generate_embeddings
 )
 from qdrant_db import client
+from qdrant_db import search_chunks
 
 app = FastAPI()
 
@@ -33,3 +34,18 @@ async def upload_file(file: UploadFile = File(...)):
     "chunks_stored": len(chunks),
     "message": "Document stored successfully!"
 }
+from pydantic import BaseModel
+
+class QuestionRequest(BaseModel):
+    question: str
+
+
+@app.post("/ask")
+def ask_question(request: QuestionRequest):
+
+    chunks = search_chunks(request.question)
+
+    return {
+        "question": request.question,
+        "relevant_chunks": chunks
+    }
