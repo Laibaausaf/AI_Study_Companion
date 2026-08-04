@@ -1,5 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
-
+from qdrant_db import store_chunks
 from util import (
     extract_text_from_pdf,
     chunk_text,
@@ -26,9 +26,10 @@ async def upload_file(file: UploadFile = File(...)):
     chunks = chunk_text(text)
 
     embeddings = generate_embeddings(chunks)
+    store_chunks(chunks, embeddings)
 
     return {
-        "filename": file.filename,
-        "total_chunks": len(chunks),
-        "embedding_dimension": len(embeddings[0]) if embeddings else 0
-    }
+    "filename": file.filename,
+    "chunks_stored": len(chunks),
+    "message": "Document stored successfully!"
+}
