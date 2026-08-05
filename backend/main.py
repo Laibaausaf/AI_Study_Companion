@@ -7,6 +7,7 @@ from util import (
 )
 from qdrant_db import client
 from qdrant_db import search_chunks
+from gemini import generate_answer
 
 app = FastAPI()
 
@@ -45,7 +46,13 @@ def ask_question(request: QuestionRequest):
 
     chunks = search_chunks(request.question)
 
+    answer = generate_answer(
+        request.question,
+        chunks
+    )
+
     return {
         "question": request.question,
-        "relevant_chunks": chunks
+        "answer": answer,
+        "sources": chunks
     }
