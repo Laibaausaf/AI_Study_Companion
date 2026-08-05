@@ -16,22 +16,26 @@ def generate_answer(question, chunks):
     prompt = f"""
 You are an AI Study Companion.
 
-Use ONLY the provided context to answer the user's question.
+You are given a syllabus extracted from a PDF.
 
-If the answer is not present in the context, reply exactly:
+Your task is to create a study plan.
 
-"I couldn't find the answer in the provided study material."
+Use ONLY the syllabus topics from the context.
 
-Do not make up information.
-Do not use your own knowledge.
+Do NOT say that the answer is not found.
+
+If the user asks for a study plan:
+
+• Divide the syllabus evenly.
+• Create a day-wise schedule.
+• Mention the topics to study each day.
+• Keep the output neat and readable.
 
 Context:
 {context}
 
-Question:
+User Request:
 {question}
-
-Answer:
 """
 
     response = client.chat.completions.create(
@@ -41,6 +45,41 @@ Answer:
         ],
         temperature=0.3,
         max_tokens=500,
+    )
+
+    return response.choices[0].message.content
+def generate_study_plan(days, chunks):
+
+    context = "\n\n".join(chunks)
+
+    prompt = f"""
+You are an expert study planner.
+
+Using ONLY the syllabus below, create a detailed {days}-day study plan.
+
+Instructions:
+- Divide topics across {days} days.
+- Keep the workload balanced.
+- Include revision days if appropriate.
+- Output in clean Markdown.
+- Use headings and bullet points.
+- Do NOT invent topics that are not in the syllabus.
+
+Syllabus:
+
+{context}
+"""
+
+    response = client.chat.completions.create(
+         model="nvidia/nemotron-3-ultra-550b-a55b:free",   # keep using the model that worked
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.5,
+        max_tokens=1200,
     )
 
     return response.choices[0].message.content

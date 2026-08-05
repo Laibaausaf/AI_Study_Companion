@@ -50,13 +50,16 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-def search_chunks(question):
+def search_chunks(question, limit=15):
     question_embedding = model.encode(question).tolist()
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=question_embedding,
-        limit=3
+        limit=limit
     )
 
-    return [point.payload["text"] for point in results.points]
+    return [
+        point.payload["text"]
+        for point in results.points
+    ]
